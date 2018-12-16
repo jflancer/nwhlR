@@ -371,6 +371,7 @@ get_play_by_play <- function(game_ids) {
   game_list <- lapply(game_ids, complete_game_scrape)
   game_list <- game_list[which(!is.na(game_list))]
   game_data <- do.call("bindingFunction", game_list)
+  return(game_data)
 }
 
 #' Schedule ID Scraper
@@ -706,6 +707,7 @@ game_team_summary <- function(pbp_df){
     dplyr::select(Season:away_team, Team, GF:SA, 'SF%', SF_5v5, SA_5v5, 'SF_5v5%', BlkF:PDO)
 
   pbp_team <- dplyr::bind_rows(pbp_stats_home, pbp_stats_away)
+  return(pbp_team)
 }
 
 #' Team Summary Function
