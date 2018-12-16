@@ -652,7 +652,7 @@ game_summary <- function(pbp_df){
 #' @keywords player
 get_player_summary <- function(pbp_df){
   player_games <- pbp_df %>%
-    ungroup() %>%
+    dplyr::ungroup() %>%
     dplyr::mutate(game_id = as.character(game_id)) %>%
     dplyr::group_by(game_id) %>%
     dplyr::do(data.frame(game_summary(.)))
