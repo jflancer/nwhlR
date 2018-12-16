@@ -394,9 +394,6 @@ complete_game_scrape <- function(game_id){
 #' This function returns a data frame of the play by play in a tidy format
 #' @param game_ids character or numeric vector of unique game ids
 #' @keywords play by play
-#' @import dplyr
-#' @import magrittr
-#' @import rjson
 #' @export
 #' @examples
 #' get_play_by_play(c("22207010","22207013"))
@@ -413,7 +410,6 @@ get_play_by_play <- function(game_ids) {
 #' @param teams takes a specific team abbreviation, such as "BUF". Defaults to all teams
 #' @keywords schedule
 #' @export
-#' @import magrittr
 #' @examples
 #' get_id_schedule("20182019", "BUF")
 get_id_schedule <- function(Season = "20182019", teams = NA){
@@ -479,8 +475,6 @@ get_id_schedule <- function(Season = "20182019", teams = NA){
 #' @param Day takes in a specific day formatted as dd
 #' @keywords date
 #' @export
-#' @import magrittr
-#' @import dplyr
 #' @examples
 #' get_id_date(Season = "20182019", Year = "2018, Month = "12", Day = "09")
 get_id_date <- function(Season = NA, Year = NA, Month = NA, Day = NA){
@@ -654,8 +648,6 @@ game_summary <- function(pbp_df){
 #'
 #' Given a tidy play by play file from get_play_by_play function, summarizes player stats at a game level
 #' @param pbp_df a dataframe consisting of play by play data from get_play_by_play function
-#' @import magrittr
-#' @import dplyr
 #' @export
 #' @keywords player
 get_player_summary <- function(pbp_df){
@@ -747,8 +739,6 @@ game_team_summary <- function(pbp_df){
 #'
 #' Given a tidy play by play file from get_play_by_play function, summarizes team stats at a game level
 #' @param pbp_df a dataframe consisting of play by play data from get_play_by_play function
-#' @import magrittr
-#' @import dplyr
 #' @export
 #' @keywords team
 get_team_summary <- function(pbp_df){
