@@ -15,7 +15,6 @@ distance_from_net <- function(x, y) {
   return(sqrt((89 - abs(x))^2 + y^2))
 }
 bindingFunction <- dplyr::bind_rows
-
 get_roster_info <- function(game_id = NA, roster_json = NA){
   if(!is.na(game_id)) {
     roster_json <- rjson::fromJSON(file =  paste("https://www.nwhl.zone/game/get_play_by_plays?id=", game_id, sep = ''))$roster_player
@@ -26,7 +25,6 @@ get_roster_info <- function(game_id = NA, roster_json = NA){
   roster_df <- do.call("bindingFunction", roster_data)
   return(roster_df)
 }
-
 get_team_info <- function(game_id = NA, team_json = NA){
   if(!is.na(game_id)) {
     team_json <- rjson::fromJSON(file = paste("https://www.nwhl.zone/game/get_play_by_plays?id=", game_id, sep = ''))$team_instance
@@ -41,7 +39,6 @@ get_team_info <- function(game_id = NA, team_json = NA){
   colnames(roster_df) <- columns
   return(roster_df)
 }
-
 get_game_info <- function(game_id = NA, game_json = NA){
   if(!is.na(game_id)) {
     game_json <- rjson::fromJSON(file = paste("https://www.nwhl.zone/game/get_play_by_plays?id=", game_id, sep = ''))$game
@@ -50,7 +47,6 @@ get_game_info <- function(game_id = NA, game_json = NA){
   game_df <- data.frame(t(game_vect), stringsAsFactors = F)
   return(game_df)
 }
-
 complete_game_scrape <- function(game_id){
   game_id <- as.character(game_id) #handle if user enters it as numeric
   print(game_id)
@@ -368,6 +364,7 @@ complete_game_scrape <- function(game_id){
 #' @param game_ids character or numeric vector of unique game ids
 #' @keywords play by play
 #' @export
+#' @import dplyr
 #' @examples
 #' get_play_by_play(c("22207010","22207013"))
 get_play_by_play <- function(game_ids) {
@@ -383,6 +380,7 @@ get_play_by_play <- function(game_ids) {
 #' @param teams takes a specific team abbreviation, such as "BUF". Defaults to all teams
 #' @keywords schedule
 #' @export
+#' @import dplyr
 #' @examples
 #' get_id_schedule("20182019", "BUF")
 get_id_schedule <- function(Season = "20182019", teams = NA){
@@ -447,6 +445,7 @@ get_id_schedule <- function(Season = "20182019", teams = NA){
 #' @param Month takes in a specifc month formatted as mm
 #' @param Day takes in a specific day formatted as dd
 #' @keywords date
+#' @import dplyr
 #' @export
 #' @examples
 #' get_id_date(Season = "20182019", Year = "2018, Month = "12", Day = "09")
@@ -622,6 +621,7 @@ game_summary <- function(pbp_df){
 #' Given a tidy play by play file from get_play_by_play function, summarizes player stats at a game level
 #' @param pbp_df a dataframe consisting of play by play data from get_play_by_play function
 #' @export
+#' @import dplyr
 #' @keywords player
 get_player_summary <- function(pbp_df){
   player_games <- pbp_df %>%
@@ -713,6 +713,7 @@ game_team_summary <- function(pbp_df){
 #' Given a tidy play by play file from get_play_by_play function, summarizes team stats at a game level
 #' @param pbp_df a dataframe consisting of play by play data from get_play_by_play function
 #' @export
+#' @import dplyr
 #' @keywords team
 get_team_summary <- function(pbp_df){
   team_games <- pbp_df %>%
