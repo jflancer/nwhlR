@@ -509,28 +509,28 @@ get_id_date <- function(Season = NA, Year = NA, Month = NA, Day = NA){
 game_summary <- function(pbp_df){
   # Pass in play by play dataframe for individual game and returns player summaries for game
   # Thanks to @EvolvingWild for providing their NHL game summary as a baseline
-  season <- dpyr::first(pbp_df$Season)
-  game_id <- dpyr::first(pbp_df$game_id)
-  date <- dpyr::first(pbp_df$game_date)
-  home <- dpyr::first(pbp_df$home_team)
-  away <- dpyr::first(pbp_df$away_team)
+  season <- dpylr::first(pbp_df$Season)
+  game_id <- dpylr::first(pbp_df$game_id)
+  date <- dpylr::first(pbp_df$game_date)
+  home <- dplyr::first(pbp_df$home_team)
+  away <- dplyr::first(pbp_df$away_team)
 
   print(game_id)
-  team_ids <- dpyr::select(get_team_info(game_id = game_id),
+  team_ids <- dplyr::select(get_team_info(game_id = game_id),
                      roster_id,
                      abbrev)
 
   roster <- get_roster_info(game_id = game_id) %>%
-    dpyr::filter(roster_type == "player") %>%
-    dpyr::select(first_name, last_name, position, roster_id) %>%
-    dpyr::mutate(Player = paste(first_name,last_name)) %>%
-    dpyr::select(-first_name, -last_name) %>%
-    dpyr::left_join(team_ids, by = c("roster_id")) %>%
-    dpyr::select(-roster_id)
+    dplyr::filter(roster_type == "player") %>%
+    dplyr::select(first_name, last_name, position, roster_id) %>%
+    dplyr::mutate(Player = paste(first_name,last_name)) %>%
+    dplyr::select(-first_name, -last_name) %>%
+    dplyr::left_join(team_ids, by = c("roster_id")) %>%
+    dplyr::select(-roster_id)
 
   pbp_player_1 <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_1, event_team) %>%
-    dpyr::summarise(G = sum(event_type == "Goal"),
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_1, event_team) %>%
+    dplyr::summarise(G = sum(event_type == "Goal"),
               SOG = sum(event_type == "Shot" | event_type == "Goal"),
               FOW = sum(event_type == "Faceoff"),
               Blk = sum(event_type == "BlockedShot"),
@@ -540,93 +540,93 @@ game_summary <- function(pbp_df){
               PPG = sum(event_type == "Goal" & ((event_team == home_team & away_skaters < 5) | (event_team == away_team & home_skaters < 5))),
               SHG = sum(event_type == "Goal" & ((event_team == home_team & home_skaters < 5) | (event_team == away_team & away_skaters < 5)))
               ) %>%
-    dpyr::rename(Player = event_player_1)
+    dplyr::rename(Player = event_player_1)
 
   pbp_player_2 <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_2, event_team) %>%
-    dpyr::summarise(A1 = sum(event_type == "Goal"),
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_2, event_team) %>%
+    dplyr::summarise(A1 = sum(event_type == "Goal"),
               PPA1 = sum(event_type == "Goal" & ((event_team == home_team & away_skaters < 5) | (event_team == away_team & home_skaters < 5))),
               SHA1 = sum(event_type == "Goal" & ((event_team == home_team & home_skaters < 5) | (event_team == away_team & away_skaters < 5)))
     ) %>%
-    dpyr::filter(!(A1 == 0 & PPA1 == 0 & SHA1 == 0)) %>%
-    dpyr::rename(Player = event_player_2)
+    dplyr::filter(!(A1 == 0 & PPA1 == 0 & SHA1 == 0)) %>%
+    dplyr::rename(Player = event_player_2)
 
   pbp_player_flipped <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_2, event_team) %>%
-    dpyr::summarise(FOL = sum(event_type == "Faceoff"),
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_2, event_team) %>%
+    dplyr::summarise(FOL = sum(event_type == "Faceoff"),
               SV = sum(event_type == "Shot")) %>%
-    dpyr::filter(FOL > 0 | SV > 0) %>%
-    dpyr::mutate(event_team = ifelse(event_team == home_team, away_team,home_team)) %>%
-    dpyr::rename(Player = event_player_2)
+    dplyr::filter(FOL > 0 | SV > 0) %>%
+    dplyr::mutate(event_team = ifelse(event_team == home_team, away_team,home_team)) %>%
+    dplyr::rename(Player = event_player_2)
 
   pbp_player_3 <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_3, event_team) %>%
-    dpyr::summarise(A2 = sum(event_type == "Goal"),
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team, event_player_3, event_team) %>%
+    dplyr::summarise(A2 = sum(event_type == "Goal"),
               PPA2 = sum(event_type == "Goal" & ((event_team == home_team & away_skaters < 5) | (event_team == away_team & home_skaters < 5))),
               SHA2 = sum(event_type == "Goal" & ((event_team == home_team & home_skaters < 5) | (event_team == away_team & away_skaters < 5)))
     ) %>%
-    dpyr::rename(Player = event_player_3)
+    dplyr::rename(Player = event_player_3)
 
   pbp_h_goalie <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team, event_team, home_goalie) %>%
-    dpyr::summarise(GA = sum(event_type == "Goal" & event_team == away_team)) %>%
-    dpyr::rename(Player = home_goalie) %>%
-    dpyr::ungroup() %>%
-    dpyr::filter(away_team == event_team) %>%
-    dpyr::mutate(event_team = home_team)
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team, event_team, home_goalie) %>%
+    dplyr::summarise(GA = sum(event_type == "Goal" & event_team == away_team)) %>%
+    dplyr::rename(Player = home_goalie) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(away_team == event_team) %>%
+    dplyr::mutate(event_team = home_team)
 
   pbp_a_goalie <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team, event_team, away_goalie) %>%
-    dpyr::summarise(GA = sum(event_type == "Goal" & event_team == home_team)) %>%
-    dpyr::rename(Player = away_goalie) %>%
-    dpyr::ungroup() %>%
-    dpyr::filter(home_team == event_team) %>%
-    dpyr::mutate(event_team = away_team)
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team, event_team, away_goalie) %>%
+    dplyr::summarise(GA = sum(event_type == "Goal" & event_team == home_team)) %>%
+    dplyr::rename(Player = away_goalie) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(home_team == event_team) %>%
+    dplyr::mutate(event_team = away_team)
 
 
-  pbp_plus_1 <- pbp_df %>% dpyr::select(event_team, plus_player_1) %>% dpyr::rename(Player = plus_player_1)
-  pbp_plus_2 <- pbp_df %>% dpyr::select(event_team, plus_player_2) %>% dpyr::rename(Player = plus_player_2)
-  pbp_plus_3 <- pbp_df %>% dpyr::select(event_team, plus_player_3) %>% dpyr::rename(Player = plus_player_3)
-  pbp_plus_4 <- pbp_df %>% dpyr::select(event_team, plus_player_4) %>% dpyr::rename(Player = plus_player_4)
-  pbp_plus_5 <- pbp_df %>% dpyr::select(event_team, plus_player_5) %>% dpyr::rename(Player = plus_player_5)
-  pbp_plus_6 <- pbp_df %>% dpyr::select(event_team, plus_player_6) %>% dpyr::rename(Player = plus_player_6)
+  pbp_plus_1 <- pbp_df %>% dplyr::select(event_team, plus_player_1) %>% dplyr::rename(Player = plus_player_1)
+  pbp_plus_2 <- pbp_df %>% dplyr::select(event_team, plus_player_2) %>% dplyr::rename(Player = plus_player_2)
+  pbp_plus_3 <- pbp_df %>% dplyr::select(event_team, plus_player_3) %>% dplyr::rename(Player = plus_player_3)
+  pbp_plus_4 <- pbp_df %>% dplyr::select(event_team, plus_player_4) %>% dplyr::rename(Player = plus_player_4)
+  pbp_plus_5 <- pbp_df %>% dplyr::select(event_team, plus_player_5) %>% dplyr::rename(Player = plus_player_5)
+  pbp_plus_6 <- pbp_df %>% dplyr::select(event_team, plus_player_6) %>% dplyr::rename(Player = plus_player_6)
   pbp_plus <- do.call("rbind",list(pbp_plus_1,pbp_plus_2,pbp_plus_3,pbp_plus_4,pbp_plus_5, pbp_plus_6)) %>%
-    dpyr::group_by(event_team,Player) %>%
-    dpyr::summarise(Plus = dpyr::n()) %>%
-    dpyr::filter(!is.na(Player))
+    dplyr::group_by(event_team,Player) %>%
+    dplyr::summarise(Plus = dplyr::n()) %>%
+    dplyr::filter(!is.na(Player))
 
-  pbp_minus_1 <- pbp_df %>% dpyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
-    dpyr::select(event_team, minus_player_1) %>% dpyr::rename(Player = minus_player_1)
-  pbp_minus_2 <- pbp_df %>% dpyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
-    dpyr::select(event_team, minus_player_2) %>% dpyr::rename(Player = minus_player_2)
-  pbp_minus_3 <- pbp_df %>% dpyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
-    dpyr::select(event_team, minus_player_3) %>% dpyr::rename(Player = minus_player_3)
-  pbp_minus_4 <- pbp_df %>% dpyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
-    dpyr::select(event_team, minus_player_4) %>% dpyr::rename(Player = minus_player_4)
-  pbp_minus_5 <- pbp_df %>% dpyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
-    dpyr::select(event_team, minus_player_5) %>% dpyr::rename(Player = minus_player_5)
-  pbp_minus_6 <- pbp_df %>% dpyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
-    dpyr::select(event_team, minus_player_6) %>% dpyr::rename(Player = minus_player_6)
+  pbp_minus_1 <- pbp_df %>% dplyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
+    dplyr::select(event_team, minus_player_1) %>% dplyr::rename(Player = minus_player_1)
+  pbp_minus_2 <- pbp_df %>% dplyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
+    dplyr::select(event_team, minus_player_2) %>% dplyr::rename(Player = minus_player_2)
+  pbp_minus_3 <- pbp_df %>% dplyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
+    dplyr::select(event_team, minus_player_3) %>% dplyr::rename(Player = minus_player_3)
+  pbp_minus_4 <- pbp_df %>% dplyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
+    dplyr::select(event_team, minus_player_4) %>% dplyr::rename(Player = minus_player_4)
+  pbp_minus_5 <- pbp_df %>% dplyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
+    dplyr::select(event_team, minus_player_5) %>% dplyr::rename(Player = minus_player_5)
+  pbp_minus_6 <- pbp_df %>% dplyr::mutate(event_team = ifelse(event_team == home_team, away_team, home_team)) %>%
+    dplyr::select(event_team, minus_player_6) %>% dplyr::rename(Player = minus_player_6)
   pbp_minus <- do.call("rbind",list(pbp_minus_1,pbp_minus_2,pbp_minus_3,pbp_minus_4,pbp_minus_5, pbp_minus_6)) %>%
-    dpyr::group_by(event_team,Player) %>%
-    dpyr::summarise(Minus = n()) %>%
-    dpyr::filter(!is.na(Player))
+    dplyr::group_by(event_team,Player) %>%
+    dplyr::summarise(Minus = n()) %>%
+    dplyr::filter(!is.na(Player))
 
   player_data <- pbp_player_1 %>%
-    dpyr::bind_rows(pbp_player_2) %>%
-    dpyr::bind_rows(pbp_player_3) %>%
-    dpyr::bind_rows(pbp_player_flipped) %>%
-    dpyr::bind_rows(pbp_h_goalie) %>%
-    dpyr::bind_rows(pbp_a_goalie) %>%
-    dpyr::bind_rows(pbp_plus) %>%
-    dpyr::bind_rows(pbp_minus) %>%
-    dpyr::left_join(roster, by = c("Player","event_team"="abbrev")) %>%
-    dpyr::rename(Team = event_team) %>%
-    dpyr::filter(!is.na(Player))
+    dplyr::bind_rows(pbp_player_2) %>%
+    dplyr::bind_rows(pbp_player_3) %>%
+    dplyr::bind_rows(pbp_player_flipped) %>%
+    dplyr::bind_rows(pbp_h_goalie) %>%
+    dplyr::bind_rows(pbp_a_goalie) %>%
+    dplyr::bind_rows(pbp_plus) %>%
+    dplyr::bind_rows(pbp_minus) %>%
+    dplyr::left_join(roster, by = c("Player","event_team"="abbrev")) %>%
+    dplyr::rename(Team = event_team) %>%
+    dplyr::filter(!is.na(Player))
 
   player_data <- player_data %>%
-    dpyr::group_by(Player,Team, position) %>%
-    dpyr::summarise_if(is.numeric, sum, na.rm = T)
+    dplyr::group_by(Player,Team, position) %>%
+    dplyr::summarise_if(is.numeric, sum, na.rm = T)
 
   player_data$Season <- season
   player_data$game_id <- game_id
@@ -634,16 +634,16 @@ game_summary <- function(pbp_df){
   player_data$home_team <- home
   player_data$away_team <- away
 
-  player_data <- dpyr::mutate(player_data,
+  player_data <- dplyr::mutate(player_data,
                         GS = ifelse(position == "G",
                                             0.14*SV - GA,
                                             G + 0.64*(A1+A2) + 0.11*SOG + 0.12*(FOW-FOL) - 0.17*(PIM/2)),
                         PTS = G+A1+A2,
                         PrPTS = G+A1,
                         GF. = ifelse((Plus+Minus) != 0 ,Plus/(Plus+Minus),NA_integer_)) %>%
-    dpyr::rename(eGF = Plus, eGA = Minus)
+    dplyr::rename(eGF = Plus, eGA = Minus)
 
-  player_data <- dpyr::select(player_data,
+  player_data <- dplyr::select(player_data,
                         Season, Player,Team,position,game_id:away_team,
                         G,A1,A2,PTS,PrPTS,GS,SOG,eGF,eGA,GF.,PPG,PPA1,PPA2,SHG,SHA1,SHA2,FOW,FOL,PIM,Blk,TO,SV,GA)
 
@@ -661,24 +661,24 @@ game_summary <- function(pbp_df){
 get_player_summary <- function(pbp_df){
   player_games <- pbp_df %>%
     ungroup() %>%
-    dpyr::mutate(game_id = as.character(game_id)) %>%
-    dpyr::group_by(game_id) %>%
+    dplyr::mutate(game_id = as.character(game_id)) %>%
+    dplyr::group_by(game_id) %>%
     do(data.frame(game_summary(.)))
   return(player_games)
 }
 
 game_team_summary <- function(pbp_df){
-  season <- dpyr::first(pbp_df$Season)
-  game_id <- dpyr::first(pbp_df$game_id)
-  date <- dpyr::first(pbp_df$game_date)
-  home <- dpyr::first(pbp_df$home_team)
-  away <- dpyr::first(pbp_df$away_team)
+  season <- dplyr::first(pbp_df$Season)
+  game_id <- dplyr::first(pbp_df$game_id)
+  date <- dplyr::first(pbp_df$game_date)
+  home <- dplyr::first(pbp_df$home_team)
+  away <- dplyr::first(pbp_df$away_team)
 
   print(game_id)
 
   pbp_stats_home <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team) %>%
-    dpyr::summarise(GF = sum(event_type == "Goal" & event_team == home_team),
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team) %>%
+    dplyr::summarise(GF = sum(event_type == "Goal" & event_team == home_team),
               GA = sum(event_type == "Goal" & event_team == away_team),
               SF = sum(event_type == "Shot" & event_team == home_team),
               SA = sum(event_type == "Shot" & event_team == away_team),
@@ -696,21 +696,21 @@ game_team_summary <- function(pbp_df){
               FOL = sum(event_type == "Faceoff" & event_team == away_team),
               periods = max(period)
     ) %>%
-    dpyr::mutate('Sh' = round(GF/SF,2),
+    dplyr::mutate('Sh' = round(GF/SF,2),
            'Sv' = round(1 - GA/SA,2),
            PDO = Sh + Sv,
            SF. = round(SF/(SF+SA),2),
            SF_5v5. = round(SF_5v5/(SF_5v5+SA_5v5),2),
            Team = home_team) %>%
-    dpyr::rename('Sh%' = Sh,
+    dplyr::rename('Sh%' = Sh,
            'Sv%' = Sv,
            'SF%' = SF.,
            'SF_5v5%' = SF_5v5.) %>%
-    dpyr::select(Season:away_team, Team, GF:SA, 'SF%', SF_5v5, SA_5v5, 'SF_5v5%', BlkF:PDO)
+    dplyr::select(Season:away_team, Team, GF:SA, 'SF%', SF_5v5, SA_5v5, 'SF_5v5%', BlkF:PDO)
 
   pbp_stats_away <- pbp_df %>%
-    dpyr::group_by(Season, game_id, game_date, home_team, away_team) %>%
-    dpyr::summarise(GF = sum(event_type == "Goal" & event_team == away_team),
+    dplyr::group_by(Season, game_id, game_date, home_team, away_team) %>%
+    dplyr::summarise(GF = sum(event_type == "Goal" & event_team == away_team),
               GA = sum(event_type == "Goal" & event_team == home_team),
               SF = sum(event_type == "Shot" & event_team == away_team),
               SA = sum(event_type == "Shot" & event_team == home_team),
@@ -728,19 +728,19 @@ game_team_summary <- function(pbp_df){
               FOL = sum(event_type == "Faceoff" & event_team == home_team),
               periods = max(period)
     ) %>%
-    dpyr::mutate('Sh' = round(GF/SF,2),
+    dplyr::mutate('Sh' = round(GF/SF,2),
            'Sv' = round(1 - GA/SA,2),
            PDO = Sh + Sv,
            SF. = round(SF/(SF+SA),2),
            SF_5v5. = round(SF_5v5/(SF_5v5+SA_5v5),2),
            Team = away_team) %>%
-    dpyr::rename('Sh%' = Sh,
+    dplyr::rename('Sh%' = Sh,
            'Sv%' = Sv,
            'SF%' = SF.,
            'SF_5v5%' = SF_5v5.) %>%
-    dpyr::select(Season:away_team, Team, GF:SA, 'SF%', SF_5v5, SA_5v5, 'SF_5v5%', BlkF:PDO)
+    dplyr::select(Season:away_team, Team, GF:SA, 'SF%', SF_5v5, SA_5v5, 'SF_5v5%', BlkF:PDO)
 
-  pbp_team <- dpyr::bind_rows(pbp_stats_home, pbp_stats_away)
+  pbp_team <- dplyr::bind_rows(pbp_stats_home, pbp_stats_away)
 }
 
 #' Team Summary Function
@@ -753,9 +753,9 @@ game_team_summary <- function(pbp_df){
 #' @keywords team
 get_team_summary <- function(pbp_df){
   team_games <- pbp_df %>%
-    dpyr::ungroup() %>%
-    dpyr::mutate(game_id = as.character(game_id)) %>%
-    dpyr::group_by(game_id) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(game_id = as.character(game_id)) %>%
+    dplyr::group_by(game_id) %>%
     do(data.frame(game_team_summary(.)))
   return(team_games)
 }
