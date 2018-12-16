@@ -663,7 +663,7 @@ get_player_summary <- function(pbp_df){
     ungroup() %>%
     dplyr::mutate(game_id = as.character(game_id)) %>%
     dplyr::group_by(game_id) %>%
-    do(data.frame(game_summary(.)))
+    dplyr::do(data.frame(game_summary(.)))
   return(player_games)
 }
 
@@ -756,6 +756,6 @@ get_team_summary <- function(pbp_df){
     dplyr::ungroup() %>%
     dplyr::mutate(game_id = as.character(game_id)) %>%
     dplyr::group_by(game_id) %>%
-    do(data.frame(game_team_summary(.)))
+    dplyr::do(data.frame(game_team_summary(.)))
   return(team_games)
 }
