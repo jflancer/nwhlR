@@ -3,7 +3,7 @@ Title: Scraper for retrieving NWHL Data
 Version: 0.0.0.9000
 Authors@R: person("Jake", "Flancer", email = "jflancer@wharton.upenn.edu", role = c("aut", "cre"))
 Description: A variety of functions working to scrape play by play data and compile player, team, and game results
-Depends: R (>= 3.5.1)
+Depends: R (>= 3.4.4)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
