@@ -509,9 +509,9 @@ get_id_date <- function(Season = NA, Year = NA, Month = NA, Day = NA){
 game_summary <- function(pbp_df){
   # Pass in play by play dataframe for individual game and returns player summaries for game
   # Thanks to @EvolvingWild for providing their NHL game summary as a baseline
-  season <- dpylr::first(pbp_df$Season)
-  game_id <- dpylr::first(pbp_df$game_id)
-  date <- dpylr::first(pbp_df$game_date)
+  season <- dplyr::first(pbp_df$Season)
+  game_id <- dplyr::first(pbp_df$game_id)
+  date <- dplyr::first(pbp_df$game_date)
   home <- dplyr::first(pbp_df$home_team)
   away <- dplyr::first(pbp_df$away_team)
 
