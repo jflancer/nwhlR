@@ -16,15 +16,6 @@ distance_from_net <- function(x, y) {
 }
 bindingFunction <- dplyr::bind_rows
 
-#' Roster Info
-#'
-#' This function retrieves a team's roster given a game id or the dataframe from the rjson output
-#' @param game_id A character on numeric unique game id found in url of nwhl.zone game pages Defaults to NA
-#' @param roster_json If user wants to use pre-specified data frame from fromJSON function
-#' @keywords roster
-#' @export
-#' @examples
-#' get_roster_info(18507502)
 get_roster_info <- function(game_id = NA, roster_json = NA){
   if(!is.na(game_id)) {
     roster_json <- rjson::fromJSON(file =  paste("https://www.nwhl.zone/game/get_play_by_plays?id=", game_id, sep = ''))$roster_player
@@ -36,15 +27,6 @@ get_roster_info <- function(game_id = NA, roster_json = NA){
   return(roster_df)
 }
 
-#' Team Info
-#'
-#' This function returns data on the team json data
-#' @param game_id A character on numeric unique game id found in url of nwhl.zone game pages Defaults to NA
-#' @param team_json If user wants to use pre-specified data frame from fromJSON function
-#' @keywords team
-#' @export
-#' @examples
-#' get_roster_info(18507502)
 get_team_info <- function(game_id = NA, team_json = NA){
   if(!is.na(game_id)) {
     team_json <- rjson::fromJSON(file = paste("https://www.nwhl.zone/game/get_play_by_plays?id=", game_id, sep = ''))$team_instance
@@ -60,15 +42,6 @@ get_team_info <- function(game_id = NA, team_json = NA){
   return(roster_df)
 }
 
-#' Game Info
-#'
-#' This function returns data on the game meta data json
-#' @param game_id A character on numeric unique game id found in url of nwhl.zone game pages Defaults to NA
-#' @param team_json If user wants to use pre-specified data frame from fromJSON function
-#' @keywords game
-#' @export
-#' @examples
-#' get_roster_info(18507502)
 get_game_info <- function(game_id = NA, game_json = NA){
   if(!is.na(game_id)) {
     game_json <- rjson::fromJSON(file = paste("https://www.nwhl.zone/game/get_play_by_plays?id=", game_id, sep = ''))$game
