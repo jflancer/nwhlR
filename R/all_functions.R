@@ -23,6 +23,7 @@ get_roster_info <- function(game_id = NA, roster_json = NA){
   roster_data <- lapply(roster_json, unlist)
   roster_data <- lapply(roster_data, FUN = function(x){ data.frame(t(x), stringsAsFactors = F) })
   roster_df <- do.call("bindingFunction", roster_data)
+  Sys.sleep(4)
   return(roster_df)
 }
 get_team_info <- function(game_id = NA, team_json = NA){
@@ -37,6 +38,7 @@ get_team_info <- function(game_id = NA, team_json = NA){
                                  nrow = length(team_data)),
                           stringsAsFactors = F)
   colnames(roster_df) <- columns
+  Sys.sleep(4)
   return(roster_df)
 }
 get_game_info <- function(game_id = NA, game_json = NA){
@@ -45,6 +47,7 @@ get_game_info <- function(game_id = NA, game_json = NA){
   }
   game_vect <- unlist(game_json)
   game_df <- data.frame(t(game_vect), stringsAsFactors = F)
+  Sys.sleep(4)
   return(game_df)
 }
 complete_game_scrape <- function(game_id){
@@ -226,7 +229,6 @@ complete_game_scrape <- function(game_id){
     play_prep$game_date <- gsub(" .*","", play_prep$game_date)
   }
 
-
   #Create Score Columns
   play_prep$home_score <- 0
   play_prep$away_score <- 0
@@ -354,7 +356,8 @@ complete_game_scrape <- function(game_id){
   date <- play_df$game_date[1]
   play_df$game_date <- date
 
-  print("    Finished")
+  message(paste("Finished",first(play_df$game_id)))
+  Sys.sleep(4)
   return(play_df)
 }
 
@@ -431,6 +434,7 @@ get_id_schedule <- function(Season = "20182019", teams = NA){
     game_ids <- stringr::str_extract_all(html,"(?<=[/])\\d{8}(?=[?])")
     #adds to vector
     all_games <- c(all_games,game_ids[[1]])
+    Sys.sleep(4)
   }
   #since duplicate games
   all_games <- unique(all_games)
@@ -469,7 +473,7 @@ get_id_date <- function(Season = NA, Year = NA, Month = NA, Day = NA){
   #Iterates through each team
   html <- paste(readLines(url), collapse="\n")
   game_ids <- stringr::str_extract_all(html,"(?<=[/])\\d{8}(?=[?])")
-
+  Sys.sleep(4)
   return(game_ids[[1]])
 }
 
