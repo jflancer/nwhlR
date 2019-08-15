@@ -216,7 +216,6 @@ complete_game_scrape <- function(game_id){
            ) %>%
     dplyr::mutate(Season = substr(Season,1,4))
 
-  #Added 9/19/18 by Carleen Markey
   #Converts source date in GMT into home team time zone then updates game_date colum with converted time
   #Set tz = to neame for the home team time zone in the local OS, ie. tz = "America/Indianapolis" each system is different
   if(any(play_prep$home_team == "MIN")) {
